@@ -83,14 +83,3 @@ uvicorn main:app --reload
 ```bash
 gunicorn -w 4 -k uvicorn.workers.UvicornWorker main:app
 ```
-
-## 🤝 Contributing (if you care)
-1. Fork it
-2. Make a branch (`git checkout -b my-branch`)
-3. Commit stuff (`git commit -m 'some changes'`)
-4. Push it (`git push origin my-branch`)
-5. Open a PR
-
-## 📧 Need help?
-Just ping me or drop a message in the group chat!
-
