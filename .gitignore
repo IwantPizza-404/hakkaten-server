@@ -1,0 +1,39 @@
+# 🛑 Игнорируем виртуальное окружение
+venv/
+# .env
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# 🛑 Игнорируем файлы базы данных (если SQLite)
+# *.db
+# *.sqlite3
+
+# 🛑 Alembic кэш-файлы
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# 🛑 Логи и временные файлы
+logs/
+*.log
+nohup.out
+*.swp
+
+# 🛑 Игнорируем IDE файлы
+.vscode/
+.idea/
+*.iml
+
+# 🛑 Docker файлы (если используете Docker)
+.dockerignore
+docker-compose.override.yml
+
+# 🛑 Node.js (если есть frontend)
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+
+# 🛑 MacOS файлы
+.DS_Store
