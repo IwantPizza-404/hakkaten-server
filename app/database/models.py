@@ -1,7 +1,22 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, func, Text
+from sqlalchemy import Column, Boolean, String, Integer, ForeignKey, DateTime, func, Text
 from sqlalchemy.orm import relationship, declarative_base
+from datetime import datetime, timezone
 
 Base = declarative_base()
+
+class UserSession(Base):
+    """Таблица для хранения refresh-токенов"""
+    __tablename__ = "user_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    refresh_token = Column(String, unique=True, nullable=False)
+    device_id = Column(String, nullable=False)  # Устройство пользователя
+    ip_address = Column(String, nullable=False)  # IP-адрес
+    user_agent = Column(String, nullable=True)  # User-Agent браузера
+    is_revoked = Column(Boolean, default=False)  # Токен отозван?
+    expires_at = Column(DateTime, nullable=False)  # Время жизни токена
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 class User(Base):
     __tablename__ = "users"
