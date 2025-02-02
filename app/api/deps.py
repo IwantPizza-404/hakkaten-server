@@ -3,12 +3,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from app.core.config import settings
-<<<<<<< HEAD
-from app.services.user import UserService
-=======
 from app.repositories.user import UserRepository
 from app.schemas.auth import TokenData
->>>>>>> 4c0d81b (update)
 from app.database.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
