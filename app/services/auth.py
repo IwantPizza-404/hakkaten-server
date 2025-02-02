@@ -3,15 +3,15 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from sqlalchemy.orm import Session
 from app.core.config import settings
-from app.core.security import verify_password
-from app.services.user import UserService
+from app.core.hashing import verify_password
+from app.repositories.user import UserRepository
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 class AuthService:
     @staticmethod
     def authenticate_user(db: Session, username: str, password: str):
-        user = UserService.get_user_by_username(db, username)
+        user = UserRepository.get_user_by_username(db, username)
         if not user or not verify_password(password, user.hashed_password):
             return None
         return user
