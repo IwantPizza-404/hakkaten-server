@@ -4,7 +4,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from app.core.config import settings
 from app.services.user import UserService
-from app.schemas.auth import TokenData
 from app.database.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
@@ -20,14 +19,16 @@ def get_current_user(
     )
     try:
         payload = jwt.decode(
-            token, 
+            token,
             settings.SECRET_KEY, 
             algorithms=[settings.ALGORITHM]
         )
-        user_id: int = int(payload.get("sub"))
-        if user_id is None:
+        user_id_str: str = payload.get("sub")
+        if user_id_str is None:
             raise credentials_exception
-    except JWTError:
+        # Convert user_id from string to integer
+        user_id = int(user_id_str)
+    except (JWTError, ValueError):
         raise credentials_exception
     
     user = UserService.get_user_by_id(db, user_id=user_id)
