@@ -15,8 +15,8 @@ class UserSession(Base):
     ip_address = Column(String, nullable=False)  # IP-адрес
     user_agent = Column(String, nullable=True)  # User-Agent браузера
     is_revoked = Column(Boolean, default=False)  # Токен отозван?
-    expires_at = Column(DateTime, nullable=False)  # Время жизни токена
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    expires_at = Column(DateTime(timezone=True), nullable=False)  # Дедлайн токена
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False) # Время создания токена
 
 class User(Base):
     __tablename__ = "users"

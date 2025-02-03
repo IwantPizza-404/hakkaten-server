@@ -1,8 +1,5 @@
-from typing import Optional
-from datetime import datetime, timezone, timedelta
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from app.database.models import User, UserSession
+from app.database.models import User
 from app.schemas.user import UserCreate
 
 class UserRepository:
@@ -18,37 +15,6 @@ class UserRepository:
         db.commit()
         db.refresh(db_user)
         return db_user
-    
-    @staticmethod
-    def save_refresh_token(db: Session, user_id: int, token: str, device_id: str, ip: str, user_agent: str):
-        """Сохраняем refresh-токен в БД"""
-        db_token = UserSession(
-            user_id=user_id,
-            refresh_token=token,
-            device_id=device_id,
-            ip_address=ip,
-            user_agent=user_agent,
-            expires_at=datetime.now(timezone.utc) + timedelta(days=7)
-        )
-        db.add(db_token)
-        db.commit()
-
-    @staticmethod
-    def revoke_refresh_token(db: Session, token: str):
-        """Отзываем refresh-токен"""
-        rows_updated = db.query(UserSession).filter(UserSession.refresh_token == token).update({"is_revoked": True})
-        print(f"🔄 Обновлено строк: {rows_updated}")
-        db.commit()
-    
-    @staticmethod
-    def is_refresh_token_valid(db: Session, token: str) -> bool:
-        """Проверяем, валиден ли refresh-токен"""
-        session = db.query(UserSession).filter(
-            UserSession.refresh_token == token,
-            UserSession.is_revoked == False,
-            UserSession.expires_at > datetime.now(timezone.utc)
-        ).first()
-        return bool(session)
 
     @staticmethod
     def get_by_id(db: Session, user_id: int) -> User:

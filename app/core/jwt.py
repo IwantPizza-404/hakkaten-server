@@ -3,21 +3,25 @@ from datetime import datetime, timedelta
 from app.core.config import settings
 from app.schemas.token import TokenPayload
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
-ALGORITHM = settings.JWT_ALGORITHM
-
 def create_access_token(subject: str) -> str:
     """Создаёт access-токен"""
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"sub": subject, "exp": expire}
-    return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    
+    token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    if isinstance(token, bytes):
+        token = token.decode()
+    return token
 
 def create_refresh_token(subject: str) -> str:
     """Создаёт refresh-токен"""
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    expire = datetime.utcnow() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     to_encode = {"sub": subject, "exp": expire}
-    return jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+    token = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    if isinstance(token, bytes):
+        token = token.decode()
+    return token
 
 def decode_access_token(token: str) -> TokenPayload:
     """Декодирует access-токен"""
