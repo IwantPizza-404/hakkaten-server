@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from app.repositories.user import UserRepository
 from app.repositories.auth import AuthRepository
-from app.core.jwt import create_access_token, create_refresh_token
+from app.core.jwt import create_access_token, create_refresh_token, verify_refresh_token
 from app.core.hashing import verify_password
 
 class AuthService:
@@ -40,21 +40,26 @@ class AuthService:
     def refresh(response: Response, db: Session, request: Request):
         """Обновление access_token"""
         refresh_token = request.cookies.get("refresh_token")
-        if not refresh_token or not AuthRepository.is_refresh_token_valid(db, refresh_token):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+        if not refresh_token:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token")
 
-        session = AuthRepository.get_session_by_token(db, refresh_token) #Убрать преоброзователь при миграции на PostgreSQL
+        try:
+            user_id = verify_refresh_token(refresh_token)
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+
+        session = AuthRepository.get_session_by_token(db, refresh_token)  # Убрать преобразователь при миграции на PostgreSQL
         if not session or session.is_revoked or session.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired")
 
         # Создаем новые токены
-        new_access_token = create_access_token(str(session.user_id))
-        new_refresh_token = create_refresh_token(str(session.user_id))
+        new_access_token = create_access_token(user_id)
+        new_refresh_token = create_refresh_token(user_id)
 
         # Обновляем refresh-токен в базе
         AuthRepository.revoke_refresh_token(db, refresh_token)
         AuthRepository.save_refresh_token(
-            db, session.user_id, new_refresh_token,
+            db, user_id, new_refresh_token,
             request.headers.get("Device-Id", "unknown_device"),
             request.client.host,
             request.headers.get("User-Agent")
