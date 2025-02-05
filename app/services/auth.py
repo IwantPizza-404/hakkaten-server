@@ -44,14 +44,17 @@ class AuthService:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token")
 
         try:
-            user_id = verify_refresh_token(refresh_token)
+            user_id = verify_refresh_token(refresh_token, request)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 
         session = AuthRepository.get_session_by_token(db, refresh_token)  # Убрать преобразователь при миграции на PostgreSQL
         if not session or session.is_revoked or session.expires_at.replace(tzinfo=timezone.utc) < datetime.now(timezone.utc):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired")
-
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token invalid or expired")
+        
+        if request.client.host != session.ip_address or request.headers.get("User-Agent") != session.user_agent:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Suspicious activity detected: Dinahuy!!!")
+        
         # Создаем новые токены
         new_access_token = create_access_token(user_id)
         new_refresh_token = create_refresh_token(user_id)
@@ -68,7 +71,7 @@ class AuthService:
         response.set_cookie(
             key="refresh_token",
             value=new_refresh_token,
-            httponly=False,
+            httponly=True,
             secure=True,
             samesite="Lax",
             path="/"
