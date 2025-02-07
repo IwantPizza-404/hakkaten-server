@@ -53,7 +53,7 @@ class AuthService:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token invalid or expired")
         
         if request.client.host != session.ip_address or request.headers.get("User-Agent") != session.user_agent:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Suspicious activity detected: Dinahuy!!!")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Suspicious activity detected")
         
         # Создаем новые токены
         new_access_token = create_access_token(user_id)

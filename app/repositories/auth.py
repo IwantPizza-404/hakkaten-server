@@ -23,7 +23,7 @@ class AuthRepository:
         """Отзываем refresh-токен"""
         print(f"Полученный токен: {token}")
         rows_updated = db.query(UserSession).filter(UserSession.refresh_token == token).update({"is_revoked": True})
-        print(f"🔄 Обновлено строк: {rows_updated}")
+        print(f"Обновлено строк: {rows_updated}")
         db.commit()
     
     @staticmethod
