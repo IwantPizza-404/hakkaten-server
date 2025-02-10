@@ -1,0 +1,1 @@
+from .models import Base  # Здесь Base - это declarative_base()

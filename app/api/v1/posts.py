@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.schemas import post, user
-from app.services.post import PostService
-from app.api.deps import get_db, get_current_user
+from app.repositories.post import PostRepository
+from app.database.session import get_db
+from app.core.deps import get_current_user
 
 router = APIRouter()
 
@@ -12,8 +13,8 @@ def create_post(
     db: Session = Depends(get_db),
     current_user: user.UserResponse = Depends(get_current_user)
 ):
-    return PostService.create_post(db, post, current_user.id)
+    return PostRepository.create(db, post, current_user.id)
 
 @router.get("/posts", response_model=list[post.PostResponse])
 def read_posts(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return PostService.get_posts(db, skip, limit)
+    return PostRepository.get(db, skip, limit)
