@@ -44,7 +44,7 @@ class AuthService:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Missing refresh token")
 
         try:
-            user_id = verify_refresh_token(refresh_token, request)
+            user_id = verify_refresh_token(refresh_token)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
 

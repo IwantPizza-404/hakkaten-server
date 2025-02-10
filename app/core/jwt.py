@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status, Request
+from fastapi import HTTPException, status
 import jwt
 from datetime import datetime, timedelta
 from app.core.config import settings

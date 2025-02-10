@@ -1,12 +1,5 @@
-fastapi
-uvicorn
-sqlalchemy
-pydantic
-pydantic-settings
-python-jose[cryptography]
-passlib
-alembic
-pydantic[email]
-jwt
-python-multipart
-bcrypt
+fastapi==0.115.8
+passlib==1.7.4
+pydantic==2.10.6
+pydantic_settings==2.7.1
+SQLAlchemy==1.4.14
