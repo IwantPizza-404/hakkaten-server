@@ -6,3 +6,7 @@ pydantic-settings
 python-jose[cryptography]
 passlib
 alembic
+pydantic[email]
+jwt
+python-multipart
+bcrypt
