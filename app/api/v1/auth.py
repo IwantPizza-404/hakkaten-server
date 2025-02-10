@@ -1,20 +1,35 @@
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, Response, Request
 from sqlalchemy.orm import Session
-from app.schemas import auth
+from fastapi.security import OAuth2PasswordRequestForm
+
+from app.database.session import get_db
 from app.services.auth import AuthService
-from app.api.deps import get_db
-from app.core.security import create_access_token
+from app.services.user import UserService
+from app.schemas.token import Token
+from app.schemas.user import UserCreate, UserResponse
 
 router = APIRouter()
 
-@router.post("/login", response_model = auth.Token)
+@router.post("/register", response_model=UserResponse)
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
+    """Регистрация нового пользователя"""
+    return UserService.register(db, user_data)
+
+@router.post("/login", response_model=Token)
 def login(
+    request: Request,
+    response: Response,  
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    user = AuthService.authenticate_user(db, form_data.username, form_data.password)
-    if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    access_token = create_access_token(data={"sub": str(user.id)})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return AuthService.login(request, response, db, form_data.username, form_data.password)
+
+@router.post("/refresh", response_model=Token)
+def refresh(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Обновление access-токена"""
+    return AuthService.refresh(response, db, request)
+
+@router.post("/logout")
+def logout(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Выход из системы"""
+    return AuthService.logout(response, db, request)
