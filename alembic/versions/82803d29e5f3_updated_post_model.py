@@ -1,8 +1,8 @@
-"""fix session table
+"""Updated Post model
 
-Revision ID: bc9dfb54a4ff
-Revises: 0b5ffb84ab92
-Create Date: 2025-02-03 23:57:37.624655
+Revision ID: 82803d29e5f3
+Revises: 8d0f3458367d
+Create Date: 2025-02-11 01:41:09.334221
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'bc9dfb54a4ff'
-down_revision: Union[str, None] = '0b5ffb84ab92'
+revision: str = '82803d29e5f3'
+down_revision: Union[str, None] = '8d0f3458367d'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

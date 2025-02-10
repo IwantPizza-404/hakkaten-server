@@ -1,8 +1,8 @@
-"""fix
+"""Updated Post model
 
-Revision ID: 0b5ffb84ab92
+Revision ID: 8d0f3458367d
 Revises: 
-Create Date: 2025-02-02 23:22:27.678713
+Create Date: 2025-02-11 01:38:14.035533
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '0b5ffb84ab92'
+revision: str = '8d0f3458367d'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -35,11 +35,10 @@ def upgrade() -> None:
     op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=True)
     op.create_table('posts',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('content', sa.Text(), nullable=False),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.Column('author_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['author_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_posts_id'), 'posts', ['id'], unique=False)
@@ -51,8 +50,8 @@ def upgrade() -> None:
     sa.Column('ip_address', sa.String(), nullable=False),
     sa.Column('user_agent', sa.String(), nullable=True),
     sa.Column('is_revoked', sa.Boolean(), nullable=True),
-    sa.Column('expires_at', sa.DateTime(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('expires_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('refresh_token')

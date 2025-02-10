@@ -14,7 +14,7 @@ class UserSession(Base):
     device_id = Column(String, nullable=False)  # Устройство пользователя
     ip_address = Column(String, nullable=False)  # IP-адрес
     user_agent = Column(String, nullable=True)  # User-Agent браузера
-    is_revoked = Column(Boolean, default=False)  # Токен отозван?
+    is_revoked = Column(Boolean, default=False)  # Отозван ли токен
     expires_at = Column(DateTime(timezone=True), nullable=False)  # Дедлайн токена
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False) # Время создания токена
 
@@ -28,17 +28,16 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    posts = relationship("Post", back_populates="owner", cascade="all, delete")
+    posts = relationship("Post", back_populates="author", cascade="all, delete")
 
 class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(255), nullable=False)
     content = Column(Text, nullable=False)
-    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    owner = relationship("User", back_populates="posts")
+    author = relationship("User", back_populates="posts")
     comments = relationship("Comment", back_populates="post")
 
 class Comment(Base):
