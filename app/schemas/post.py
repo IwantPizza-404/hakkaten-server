@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -14,3 +15,4 @@ class PostResponse(PostBase):
     id: int
     author_id: int
     created_at: datetime
+    image_url: Optional[str] = Field(default=None)
